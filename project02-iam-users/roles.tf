@@ -68,3 +68,21 @@ resource "aws_iam_role_policy_attachment" "role_policy_attachments" {
     local.role_policies_list[count.index].policy
   ].arn
 }
+
+data "aws_iam_policy_document" "assume_role_permission" {
+  for_each = local.users_map
+
+  statement {
+    actions = ["sts:AssumeRole"]
+    resources = [
+      for role in each.value : aws_iam_role.roles[role].arn
+    ]
+  }
+}
+
+resource "aws_iam_user_policy" "assume_role" {
+  for_each = local.users_map
+  name     = "assume-role"
+  user     = each.key
+  policy   = data.aws_iam_policy_document.assume_role_permission[each.key].json
+}
