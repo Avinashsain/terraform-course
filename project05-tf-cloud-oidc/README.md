@@ -58,6 +58,22 @@ exist under the given IDs, remove the relevant `import` block (or run
 `terraform plan` first to see which imports fail) so Terraform creates them
 instead.
 
+## Destroying just the S3 bucket
+
+To tear down `s3.tf`'s bucket without touching the OIDC provider, admin role,
+or policy attachment, target it explicitly:
+
+```bash
+terraform plan -destroy -target=aws_s3_bucket.this
+terraform destroy -target=aws_s3_bucket.this
+```
+
+- `random_id.bucket_suffix` isn't destroyed by this target (it's not
+  depended on by the bucket), so it stays in state. Add
+  `-target=random_id.bucket_suffix` to both commands if you want it gone too.
+- The bucket has no `force_destroy = true`, so `destroy` fails with
+  `BucketNotEmpty` if it still contains objects — empty it first.
+
 ## Notes
 
 - The IAM role name (`terrform-cloud-automation-admin` in
