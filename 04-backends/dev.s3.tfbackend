@@ -1,0 +1,3 @@
+bucket = "capstone-tfstate-b15"
+key    = "04-backends/dev/terraform.tfstate"
+region = "us-east-1"
